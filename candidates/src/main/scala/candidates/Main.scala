@@ -8,12 +8,23 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 import japgolly.scalajs.react.{ React, ReactComponentB }
 import japgolly.scalajs.react.extra.router2.{ Router, RouterConfigDsl, BaseUrl, Redirect }
 import org.scalajs.dom
+import org.scalajs.dom.Element
 
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
 
 object Main extends JSApp {
-  val langB = new RouteB[Lang]("(ja|en)", 1, g => Lang.valueOf(g(0)), _.string)
+  // HTML element ID to embed this application
+  val appElementId = "candidates"
+
+  val defaultLang = Lang.English
+
+  def parseLang(element: Element): Lang =
+    Option(element.getAttribute("data-lang")).flatMap(Lang.valueOf)
+      .getOrElse(defaultLang)
+
+  def parseLang(): Lang =
+    parseLang(dom.document.getElementById(appElementId))
 
   @JSExport
   override def main(): Unit = {
@@ -22,19 +33,19 @@ object Main extends JSApp {
       import dsl._
 
       (
-        dynamicRouteCT(("#list" / langB).caseclass1(ListP.apply)(ListP.unapply)) ~>
-        dynRenderR { case (ListP(l), ctl) => ListPage(l, ctl) } |
+        staticRoute("#list", ListP) ~>
+        renderR(ctl => ListPage(parseLang(), ctl)) |
 
-        dynamicRouteCT(("#" ~ int / langB).caseclass2(DetailP.apply)(DetailP.unapply)) ~>
-        dynRenderR { case (DetailP(id, l), ctl) => DetailPage(l, id, ctl) }
+        dynamicRouteCT(("#" ~ int).caseclass1(DetailP.apply)(DetailP.unapply)) ~>
+        dynRenderR { case (DetailP(id), ctl) => DetailPage(parseLang(), id, ctl) }
 
       )
-        .notFound(redirectToPage(ListP(English))(Redirect.Replace))
+        .notFound(redirectToPage(ListP)(Redirect.Replace))
     }
 
-    val baseUrl = BaseUrl.fromWindowOrigin / "candidates/"
+    val baseUrl = BaseUrl(dom.window.location.href.replaceFirst("#.*$", ""))
     val router = Router(baseUrl, routerConfig)
 
-    React.render(router(), dom.document.getElementById("candidates"))
+    React.render(router(), dom.document.getElementById(appElementId))
   }
 }

@@ -1,5 +1,6 @@
 package candidates.pages
 
+import candidates.Page.ListP
 import candidates.{ Page, Lang, Candidate }
 import japgolly.scalajs.react.{ ReactElement, ReactComponentB }
 import japgolly.scalajs.react.vdom.prefix_<^._
@@ -16,10 +17,12 @@ object DetailPage {
       } yield {
         <.div(
           ^.id := s"candidate-${candidate.id}",
-
+          <.h2(desc.title),
+          <.div(^.className := "abst", desc.abst),
           <.img(^.src := candidate.iconUrl, ^.className := "icon"),
           desc.name,
-          desc.abst
+          <.hr,
+          p.ctl.link(ListP)("Back to list")
         ): ReactElement
       }).getOrElse(<.div("Not found"))
     }.build

@@ -1,5 +1,7 @@
 package candidates
 
+import scala.util.Random
+
 case class Candidate(
   id: Int,
   iconUrl: Option[String],
@@ -62,4 +64,6 @@ object Candidate {
       )
     )
   )
+
+  lazy val shuffledList: Seq[Candidate] = Random.shuffle(list)
 }

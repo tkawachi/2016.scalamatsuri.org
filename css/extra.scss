@@ -23,8 +23,22 @@
 
 .candidates {
   min-height: 400px;
+
+  .icon-mini {
+    width: 30px;
+    height: 30px;
+  }
+
   .icon {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .candidate-row {
+    margin-bottom: 10px;
+  }
+
+  .abst {
+    white-space: pre-wrap;
   }
 }
